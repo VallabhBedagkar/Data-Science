@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify,render_template
 import pickle
 import numpy as np
 import json
@@ -11,20 +11,25 @@ with open('model.pkl', 'rb') as f:
 
 @app.route('/')
 def home():
-    return "Credit Card Fraud Detection API is running!"
+    return render_template('predict_form.html')
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    data = request.get_json(force=True)
-    features = data.get('features', None)
+    try:
+        raw_input = request.form['features']
+        features = [float(x.strip()) for x in raw_input.split(',')]
+        input_array = np.array([features])  # reshape for model
+        prediction = model.predict(input_array)[0]
 
-    if features is None:
-        return jsonify({'error': 'No features provided'}), 400
+        result = "❌ Fraudulent Transaction" if prediction == 1 else "✅ Legitimate Transaction"
+        return render_template('predict_form.html', prediction_text=result)
+    except Exception as e:
+        return render_template('predict_form.html', prediction_text=f"⚠️ Error: {str(e)}")
 
-    features_np = np.array(features).reshape(1, -1)
-    prediction = model.predict(features_np)[0]
+if __name__ == '__main__':
+    app.run(debug=True)
 
-    return jsonify({'prediction': int(prediction)})
+
 
 if __name__ == '__main__':
     app.run(debug=True)
