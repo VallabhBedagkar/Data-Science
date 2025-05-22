@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Credit Card Fraud Prediction</title>
+</head>
+<body>
+    <h2>Enter PCA Features (comma-separated)</h2>
+    <form method="post" action="/predict">
+        <textarea name="features" rows="4" cols="80" placeholder="Paste 29 comma-separated values here..."></textarea><br><br>
+        <input type="submit" value="Predict">
+    </form>
+
+    {% if prediction_text %}
+        <h3>{{ prediction_text }}</h3>
+    {% endif %}
+</body>
+</html>
